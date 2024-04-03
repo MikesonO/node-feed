@@ -1,7 +1,10 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 
 const feedRoutes = require('./routes/feed');
+
+const MONGODB_URI = process.env.MONGODB_URI;
 
 const app = express();
 
@@ -19,4 +22,11 @@ app.use((req, res, next) => {
 // Forward any incoming requests that starts with /feed
 app.use('/feed', feedRoutes);
 
-app.listen(8080);
+mongoose.connect(MONGODB_URI)
+    .then(result => {
+        app.listen(8080);
+    })
+    .catch(err => {
+        console.log(err);
+    })
+
