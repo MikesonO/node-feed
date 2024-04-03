@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Scheme = mongoose.Schema;
+const Schema = mongoose.Schema;
 
 const postSchema = new Schema({
     title: {
@@ -16,7 +16,7 @@ const postSchema = new Schema({
     },
     creator: {
         type: Object,
-        required: String
+        required: true
     }
 
 },
