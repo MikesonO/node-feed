@@ -4,6 +4,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv').config();
 const mongoose = require('mongoose');
+const multer = require('multer');
 
 const feedRoutes = require('./routes/feed');
 
@@ -11,8 +12,28 @@ const MONGODB_URI = process.env.MONGODB_URI;
 
 const app = express();
 
+// Multer storage - Controls where file gets stored
+const fileStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'images');
+    },
+    filename: (req, file, cb) => {
+        cb(null, new Date().toISOString + '-' + file.originalname);
+    }
+});
+
+// Multer fileFilter - Check files Mimetype
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype === 'image/png' || file.mimetype === 'image/jpg' || file.mimetype === 'image/jpeg') {
+        cb(null, true);
+    } else {
+        cb(null, false);
+    }
+};
+
 // Content-Type: application/json
 app.use(bodyParser.json());
+app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('image'));
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
 // Resolve CORS error
