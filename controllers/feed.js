@@ -152,3 +152,28 @@ exports.updatePost = (req, res, next) => {
             handleError(err, next);
         });
 };
+
+exports.deletePost = (req, res, next) => {
+    const postId = req.params.postId;
+    Post.findById(postId)
+        .then(post => {
+            if (!post) {
+                const error = new Error('Could not find post.');
+                error.statusCode = 404;
+                throw error;
+            }
+
+            // Check logged in User TBC...
+
+            clearImage(post.imageUrl);
+
+            return Post.findByIdAndDelete(postId);
+        })
+        .then(result => {
+            console.log(result);
+            res.status(200).json({ message: 'Deleted post!' });
+        })
+        .catch(err => {
+            handleError(err, next);
+        })
+}
