@@ -9,6 +9,8 @@ const { v4: uuidv4 } = require('uuid');
 
 
 const feedRoutes = require('./routes/feed');
+const authRoutes = require('./routes/auth');
+
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
@@ -48,6 +50,9 @@ app.use((req, res, next) => {
 
 // Forward any incoming requests that starts with /feed
 app.use('/feed', feedRoutes);
+
+// Forward any incoming requests that starts with /auth
+app.use('/auth', authRoutes);
 
 
 // Error Handling
