@@ -153,6 +153,12 @@ exports.updatePost = (req, res, next) => {
                 throw error;
             }
 
+            if (post.creator.toString() !== req.userId) {
+                const error = new Error('Not authorized!');
+                error.statusCode = 403;
+                throw error;
+            }
+
             if (imageUrl !== post.imageUrl) {
                 clearImage(post.imageUrl);
             }
@@ -182,7 +188,12 @@ exports.deletePost = (req, res, next) => {
                 throw error;
             }
 
-            // Check logged in User TBC...
+            // Check logged in User
+            if (post.creator.toString() !== req.userId) {
+                const error = new Error('Not authorized!');
+                error.statusCode = 403;
+                throw error;
+            }
 
             clearImage(post.imageUrl);
 
