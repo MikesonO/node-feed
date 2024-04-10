@@ -2,6 +2,7 @@ const User = require('../models/user');
 
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
+const jsonWebToken = require('jsonwebtoken');
 
 // Functions
 const handleError = (err, next) => {
@@ -61,6 +62,16 @@ exports.login = (req, res, next) => {
                 error.statusCode = 401;
                 throw error;
             }
+
+            console.log(process.env.SECRET_PHRASE)
+
+            const token = jsonWebToken.sign({
+                email: loadedUser.email,
+                userId: loadedUser._id.toString()
+            }, process.env.SECRET_PHRASE, { expiresIn: '1h' });
+
+            res.status(200).json({ token: token, userId: loadedUser._id.toString() });
+
         })
         .catch(err => {
             handleError(err, next);
