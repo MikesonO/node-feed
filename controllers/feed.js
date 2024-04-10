@@ -214,3 +214,39 @@ exports.deletePost = (req, res, next) => {
             handleError(err, next);
         })
 }
+
+exports.getStatus = (req, res, next) => {
+    let userId = req.userId;
+
+    User.findById(userId)
+        .then(user => {
+            if (!user) {
+                return res.status(404).json({ message: "User not found." });
+            }
+            const status = user.status;
+            return res.status(200).json({ status });
+        })
+        .catch(err => {
+            handleError(err, next);
+        })
+}
+
+exports.updateStatus = (req, res, next) => {
+    let userId = req.userId;
+    const updatedStatus = req.body.status;
+
+    User.findById(userId)
+        .then(user => {
+            if (!user) {
+                return res.status(404).json({ message: "User not found." });
+            }
+            user.status = updatedStatus;
+            return user.save()
+        })
+        .then(result => {
+            res.status(200).json({ message: 'User updated.' });
+        })
+        .catch(err => {
+            handleError(err, next);
+        })
+}
