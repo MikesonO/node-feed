@@ -63,8 +63,6 @@ exports.login = (req, res, next) => {
                 throw error;
             }
 
-            console.log(process.env.SECRET_PHRASE)
-
             const token = jsonWebToken.sign({
                 email: loadedUser.email,
                 userId: loadedUser._id.toString()

@@ -3,6 +3,7 @@ const path = require('path');
 const { validationResult } = require('express-validator');
 
 const Post = require('../models/post');
+const User = require('../models/user');
 
 
 // Functions
@@ -68,43 +69,49 @@ exports.getPost = (req, res, next) => {
         });
 };
 
-
 exports.createPost = (req, res, next) => {
-    const errors = validationResult(req);
 
     // If errors exist
+    const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        const error = new Error("Validation failed, entered data is incorrect.");
+        const error = new Error('Validation failed, entered data is incorrect.');
         error.statusCode = 422;
         throw error;
     }
-
     if (!req.file) {
         const error = new Error('No image provided.');
         error.statusCode = 422;
         throw error;
     }
-
-    const title = req.body.title;
     const imageUrl = req.file.path;
+    const title = req.body.title;
     const content = req.body.content;
+    let creator;
 
     // Post data
     const post = new Post({
         title: title,
-        imageUrl: imageUrl,
         content: content,
-        creator: {
-            name: "Mikeson"
-        }
-    })
-    // Save / Store post data to DB
-    post.save()
+        imageUrl: imageUrl,
+        creator: req.userId
+    });
+
+    post
+        // Save / Store post data to DB
+        .save()
         .then(result => {
-            console.log(result);
+            return User.findById(req.userId);
+        })
+        .then(user => {
+            creator = user;
+            user.posts.push(post);
+            return user.save();
+        })
+        .then(result => {
             res.status(201).json({
-                message: "Post created successfully!",
-                post: result
+                message: 'Post created successfully!',
+                post: post,
+                creator: { _id: creator._id, name: creator.name }
             });
         })
         .catch(err => {

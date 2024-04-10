@@ -21,7 +21,7 @@ router.post('/post', [
     body('content')
         .trim()
         .isLength({ min: 5 })
-], feedController.createPost);
+], isAuth, feedController.createPost);
 
 // PUT /feed/post - Update Post
 router.put('/post/:postId', [
@@ -31,7 +31,7 @@ router.put('/post/:postId', [
     body('content')
         .trim()
         .isLength({ min: 5 })
-], feedController.updatePost);
+], isAuth, feedController.updatePost);
 
 // DELETE /feed/post - Delete Post
 router.delete('/post/:postId', isAuth, feedController.deletePost);
