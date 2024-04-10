@@ -27,7 +27,7 @@ const clearImage = filePath => {
 };
 
 
-// Endpoints
+// Endpoints functions
 exports.getPosts = (req, res, next) => {
     const currentPage = req.query.page || 1;
     const perPage = 2;
