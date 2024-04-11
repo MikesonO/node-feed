@@ -54,12 +54,13 @@ exports.getPost = async (req, res, next) => {
 
     // Find postId in the database
     try {
-        const post = await Post.findById(postId)
+        const post = await Post.findById(postId).populate('creator');
         if (!post) {
             const error = new Error('Could not find post.');
             error.statusCode = 404;
             throw error;
         }
+
         res.status(200).json({ message: 'Post fetched.', post: post });
     } catch (error) {
         handleError(err, next);
@@ -110,7 +111,7 @@ exports.createPost = async (req, res, next) => {
         // Send message to all connected users
         io.getIO().emit('posts', {
             action: 'create',
-            post: post
+            post: { ...post._doc, creator: { _id: req.userId, name: user.name } }
         });
 
         // Send response
