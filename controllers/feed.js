@@ -197,7 +197,7 @@ exports.deletePost = async (req, res, next) => {
         }
 
         // Check logged in User
-        if (post.creator.toString() !== req.userId) {
+        if (post.creator._id.toString() !== req.userId) {
             const error = new Error('Not authorized!');
             error.statusCode = 403;
             throw error;
@@ -210,6 +210,9 @@ exports.deletePost = async (req, res, next) => {
         const user = await User.findById(req.userId);
         user.posts.pull(postId);
         await user.save();
+
+        // Delete post for all users
+        io.getIO().emit('posts', { action: 'delete', post: post })
 
         res.status(200).json({ message: 'Deleted post!' });
     } catch (err) {
