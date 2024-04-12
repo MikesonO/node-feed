@@ -3,6 +3,7 @@ const validator = require('validator');
 const jsonWebToken = require('jsonwebtoken');
 
 const User = require('../models/user');
+const Post = require('../models/post');
 
 module.exports = {
     createUser: async function ({ userInput }, req) {
@@ -71,8 +72,43 @@ module.exports = {
 
         return { token: token, userId: user._id.toString() };
 
+    },
+
+    createPost: async function ({ postInput }) {
+        const errorsArray = [];
+
+        // Validate Title
+        if (validator.isEmpty(postInput.title) || !validator.isLength(postInput.title, { min: 5 })) {
+            errorsArray.push({ message: 'Title is invalid!' });
+        }
 
 
+        // Validate Content
+        if (validator.isEmpty(postInput.content) || !validator.isLength(postInput.content, { min: 5 })) {
+            errorsArray.push({ message: 'Content is invalid!' });
+        }
 
-    }
+        // Check errorsArray
+        if (errorsArray.length > 0) {
+            const error = new Error('Invalid input.');
+            error.data = errorsArray;
+            error.code = 422;
+            throw error;
+        }
+
+        const post = new Post({
+            title: postInput.title,
+            imageUrl: postInput.imageUrl,
+            content: postInput.content
+        });
+
+        const createdPost = await post.save();
+
+        return {
+            ...createdPost._doc,
+            _id: createdPost._id.toString,
+            createAt: createdPost.createdAt.toISOString(),
+            updatedAt: createdPost.updatedAt.toISOString()
+        }
+    },
 }

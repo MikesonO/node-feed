@@ -33,12 +33,19 @@ input UserInputData {
 
 }
 
+input PostInputData {
+    title: String!
+    imageUrl: String!
+    content: String!
+}
+
 type RootQuery {
     login(email: String!, password: String!): AuthData!
 }
 
 type RootMutation {
     createUser(userInput: UserInputData): User!
+    createPost(postInput: PostInputData): Post!
 }
 
 schema {
