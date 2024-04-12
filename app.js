@@ -45,8 +45,11 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*'); // '*' allows access to any client OR 'codepen.io' for specific access.
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE'); // Methods to allow clients
     res.setHeader('Access-Control-Allow-Headers', ' Content-Type, Authorization');
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(200);
+    }
     next();
-})
+});
 
 // 
 app.use('/graphql', graphqlHTTP({
