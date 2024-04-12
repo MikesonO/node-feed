@@ -4,7 +4,6 @@ const jsonWebToken = require('jsonwebtoken');
 
 const User = require('../models/user');
 const Post = require('../models/post');
-const user = require('../models/user');
 
 module.exports = {
     createUser: async function ({ userInput }, req) {
@@ -75,8 +74,7 @@ module.exports = {
 
     },
 
-    createPost: async function ({ postInput }) {
-
+    createPost: async function ({ postInput }, req) {
         // Check if User is authenticated
         if (!req.isAuth) {
             const error = new Error('Not authenticated!');
@@ -126,9 +124,9 @@ module.exports = {
 
         return {
             ...createdPost._doc,
-            _id: createdPost._id.toString,
-            createAt: createdPost.createdAt.toISOString(),
+            _id: createdPost._id.toString(),
+            createdAt: createdPost.createdAt.toISOString(),
             updatedAt: createdPost.updatedAt.toISOString()
-        }
+        };
     },
 }
