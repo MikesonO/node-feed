@@ -7,11 +7,6 @@ const mongoose = require('mongoose');
 const multer = require('multer');
 const { v4: uuidv4 } = require('uuid');
 
-
-const feedRoutes = require('./routes/feed');
-const authRoutes = require('./routes/auth');
-
-
 const MONGODB_URI = process.env.MONGODB_URI;
 
 const app = express();
@@ -48,13 +43,6 @@ app.use((req, res, next) => {
     next();
 })
 
-// Forward any incoming requests that starts with /feed
-app.use('/feed', feedRoutes);
-
-// Forward any incoming requests that starts with /auth
-app.use('/auth', authRoutes);
-
-
 // Error Handling
 app.use((error, req, res, next) => {
     console.log(error);
@@ -66,9 +54,7 @@ app.use((error, req, res, next) => {
 
 mongoose.connect(MONGODB_URI)
     .then(result => {
-        const server = app.listen(8080);
-        const { init } = require('./socket');
-        init(server);
+        app.listen(8080);
     })
     .catch(err => {
         console.log(err);
