@@ -4,6 +4,7 @@ const jsonWebToken = require('jsonwebtoken');
 
 const User = require('../models/user');
 const Post = require('../models/post');
+const user = require('../models/user');
 
 module.exports = {
     createUser: async function ({ userInput }, req) {
@@ -75,6 +76,14 @@ module.exports = {
     },
 
     createPost: async function ({ postInput }) {
+
+        // Check if User is authenticated
+        if (!req.isAuth) {
+            const error = new Error('Not authenticated!');
+            error.code = 401;
+            throw error;
+        }
+
         const errorsArray = [];
 
         // Validate Title
@@ -96,13 +105,24 @@ module.exports = {
             throw error;
         }
 
+        // Get User
+        const user = await User.findById(req.userId);
+        if (!user) {
+            const error = new Error('Invalid user.');
+            error.code = 401;
+            throw error;
+        }
+
+        // Create post
         const post = new Post({
             title: postInput.title,
             imageUrl: postInput.imageUrl,
-            content: postInput.content
+            content: postInput.content,
+            creator: user
         });
 
         const createdPost = await post.save();
+        user.posts.push(createdPost);
 
         return {
             ...createdPost._doc,

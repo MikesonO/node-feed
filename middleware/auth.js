@@ -5,9 +5,8 @@ module.exports = (req, res, next) => {
 
     // Check if Authorization is in the header
     if (!authHeader) {
-        const error = new Error('Not authenticated');
-        error.statusCode = 401;
-        throw error;
+        req.isAuth = false;
+        return next();
     }
 
     const token = authHeader.split(' ')[1];
@@ -17,17 +16,17 @@ module.exports = (req, res, next) => {
     try {
         decodedToken = jsonWebToken.verify(token, process.env.SECRET_PHRASE);
     } catch (err) {
-        err.statusCode = 500;
-        throw err;
+        req.isAuth = false;
+        return next();
     }
 
     // Check exists is attached
     if (!decodedToken) {
-        const error = new Error('Not authenticated.');
-        error.statusCode = 401;
-        throw error;
+        req.isAuth = false;
+        return next();
     }
 
     req.userId = decodedToken.userId;
+    req.isAuth = true;
     next();
 }

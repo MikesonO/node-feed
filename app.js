@@ -11,7 +11,7 @@ const { graphqlHTTP } = require('express-graphql');
 const graphqlSchema = require('./graphql/schema');
 const graphqlResolvers = require('./graphql/resolvers');
 
-
+const auth = require('./middleware/auth');
 const MONGODB_URI = process.env.MONGODB_URI;
 
 const app = express();
@@ -51,7 +51,9 @@ app.use((req, res, next) => {
     next();
 });
 
-// 
+app.use(auth);
+
+// GraphQL connection
 app.use('/graphql', graphqlHTTP({
     schema: graphqlSchema,
     rootValue: graphqlResolvers,
