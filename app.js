@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -15,6 +16,21 @@ const auth = require('./middleware/auth');
 const MONGODB_URI = process.env.MONGODB_URI;
 
 const app = express();
+
+
+// Functions
+const clearImage = filePath => {
+    filePath = path.join(__dirname, '..', filePath);
+    fs.unlink(filePath, err => {
+        if (err) {
+            console.error(err);
+            return err;
+        } else {
+            console.log("Image File updated successfully");
+            return null;
+        }
+    });
+};
 
 // Multer storage - Controls where file gets stored
 const fileStorage = multer.diskStorage({
@@ -52,6 +68,24 @@ app.use((req, res, next) => {
 });
 
 app.use(auth);
+
+
+app.put('/post-image', (req, res, next) => {
+    if (!req.isAuth) {
+        throw new Error('Not authenticated!');
+    }
+    if (!req.file) {
+        return res.status(200).json({ message: 'No file provided!' });
+    }
+
+    if (req.body.oldPath) {
+        clearImage(req.body.oldPath);
+    }
+
+    return res
+        .status(202)
+        .json({ message: 'File stored.', filePath: req.file.path });
+});
 
 // GraphQL connection
 app.use('/graphql', graphqlHTTP({
