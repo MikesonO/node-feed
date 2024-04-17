@@ -1,5 +1,4 @@
 const path = require('path');
-const fs = require('fs');
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -12,25 +11,13 @@ const { graphqlHTTP } = require('express-graphql');
 const graphqlSchema = require('./graphql/schema');
 const graphqlResolvers = require('./graphql/resolvers');
 
+
 const auth = require('./middleware/auth');
+const { clearImage } = require('./util/file');
 const MONGODB_URI = process.env.MONGODB_URI;
 
 const app = express();
 
-
-// Functions
-const clearImage = filePath => {
-    filePath = path.join(__dirname, '..', filePath);
-    fs.unlink(filePath, err => {
-        if (err) {
-            console.error(err);
-            return err;
-        } else {
-            console.log("Image File updated successfully");
-            return null;
-        }
-    });
-};
 
 // Multer storage - Controls where file gets stored
 const fileStorage = multer.diskStorage({
